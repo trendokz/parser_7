@@ -1,8 +1,8 @@
 import os
 import time
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service  # новый вид записи driver
 from selenium.webdriver.common.by import By  # новый вид записи find_element
+from selenium.webdriver.chrome.options import Options
 
 from datetime import datetime
 import requests
@@ -47,15 +47,14 @@ def get_data():
             url_a_one = f"https://leroymerlin.kz{url_li_one.find('div', class_='subcategory__head-wrapper').find('a').get('href')}"
             dict_categories.append(url_a_one)
 
-    chrome_options = webdriver.ChromeOptions()
+    chrome_options = Options()
     chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
+    WINDOW_SIZE = "1920,1080"
+    chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--start-maximized")
-
-    # Фоновый режим
-    # options.add_argument('--headless')
 
     # executable_path="109.exe"
     driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
