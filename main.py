@@ -57,8 +57,8 @@ def get_data():
     # Фоновый режим
     # options.add_argument('--headless')
 
-    service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))  # executable_path="109.exe"
-    driver = webdriver.Chrome(service=service, chrome_options=chrome_options)
+    # executable_path="109.exe"
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
     driver.get(url='https://www.google.com/')
 
     url_products = []
