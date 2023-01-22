@@ -6,4 +6,3 @@ schedule==1.1.0
 lxml
 requests==2.28.2
 selenium
-selenium-stealth

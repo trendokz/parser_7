@@ -1,7 +1,6 @@
 import os
 import time
 from selenium import webdriver
-from selenium_stealth import stealth  # Очень помогает для обхода блокировок на сайтах
 from selenium.webdriver.chrome.service import Service  # новый вид записи driver
 from selenium.webdriver.common.by import By  # новый вид записи find_element
 
@@ -48,45 +47,19 @@ def get_data():
             url_a_one = f"https://leroymerlin.kz{url_li_one.find('div', class_='subcategory__head-wrapper').find('a').get('href')}"
             dict_categories.append(url_a_one)
 
-    # Сбор всех карточек товарами из каждого каталога
-    options = webdriver.ChromeOptions()
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
-    # Путь для хром бета
-    # options.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
-    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    # Сделать в полный экран
-    options.add_argument("--start-maximized")
-    # Отключение Webdriver
-    options.add_argument("--disable-blink-features=AutomationControlled")
-
-    options.add_argument('--no-sandbox')
-    options.add_argument('enable-automation')
-    options.add_argument('--disable-infobars')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-browser-side-navigation')
-    options.add_argument("--remote-debugging-port=9222")
-    options.add_argument('--disable-gpu')
-    options.add_argument("--log-level=3")
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--start-maximized")
 
     # Фоновый режим
     # options.add_argument('--headless')
 
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])  # selenium-stealth
-    options.add_experimental_option('useAutomationExtension', False)  # selenium-stealth
-
     service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))  # executable_path="109.exe"
-    driver = webdriver.Chrome(service=service, options=options)
+    driver = webdriver.Chrome(service=service, chrome_options=chrome_options)
     driver.get(url='https://www.google.com/')
-
-    # selenium-stealth
-    stealth(driver,
-            languages=["en-US", "en"],
-            vendor="Google Inc.",
-            platform="Win64",
-            webgl_vendor="Intel Inc.",
-            renderer="Intel Iris OpenGL Engine",
-            fix_hairline=True
-            )
 
     url_products = []
     count_catalog = 0
