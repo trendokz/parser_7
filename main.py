@@ -1,3 +1,4 @@
+import os
 import time
 from selenium import webdriver
 from selenium_stealth import stealth  # Очень помогает для обхода блокировок на сайтах
@@ -52,6 +53,7 @@ def get_data():
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
     # Путь для хром бета
     # options.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     # Сделать в полный экран
     options.add_argument("--start-maximized")
     # Отключение Webdriver
@@ -72,7 +74,7 @@ def get_data():
     options.add_experimental_option("excludeSwitches", ["enable-automation"])  # selenium-stealth
     options.add_experimental_option('useAutomationExtension', False)  # selenium-stealth
 
-    service = Service(executable_path="109.exe")
+    service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))  # executable_path="109.exe"
     driver = webdriver.Chrome(service=service, options=options)
     driver.get(url='https://www.google.com/')
 
