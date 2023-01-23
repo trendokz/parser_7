@@ -56,11 +56,13 @@ def get_data():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--start-maximized")
 
-    # executable_path="109.exe"
+    # executable_path="109.exe" executable_path=os.environ.get("CHROMEDRIVER_PATH")
     driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
     driver.get(url='https://www.google.com/')
 
-    url_products = []
+    # del dict_categories[0:160]
+
+    list_products = [['Каталог', 'Артикул', 'Название', 'Цена', 'В наличии шт', ' Количество отзывы', 'Ссылка']]
     count_catalog = 0
     while len(dict_categories) != 0:
         try:
@@ -127,7 +129,12 @@ def get_data():
                     categories_all = driver.find_elements(By.XPATH, '//*[@id="vue-app"]/section[1]/div/div/ul/li')
                     categories = f'{categories_all[2].text}/{categories_all[-1].text}'
 
-                    print(f'{name} - {price} - {count_products} - {count_review} - {article} - {categories} - {finish_url_product[0]}')
+                    list_products.append(
+                        [
+                            categories, article, name, price, count_products, count_review, finish_url_product[0]
+                        ]
+                    )
+                    # print(f'{name} - {price} - {count_products} - {count_review} - {article} - {categories} - {finish_url_product[0]}')
 
                     del finish_url_product[0]
                     # time.sleep(0.5)
@@ -153,57 +160,56 @@ def get_data():
     driver.close()
     driver.quit()
 
-    print(len(url_products))
-    print(len(list(set(url_products))))
+    google_table(dict_cards=list_products)
 
 
-# def google_table(dict_cards):
-#     import os.path
-#
-#     from googleapiclient.discovery import build
-#     from googleapiclient.errors import HttpError
-#     from google.oauth2 import service_account
-#
-#     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-#
-#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#     SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'credentials.json')
-#
-#     credentials = service_account.Credentials.from_service_account_file(
-#         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-#
-#     # mail bot 'parsers@parsers-372008.iam.gserviceaccount.com'
-#     SAMPLE_SPREADSHEET_ID = '107SdHe8_dV6npe_dKE-7xA2QJgxz6ZOywOy-GZyrZX0'
-#     SAMPLE_RANGE_NAME = 'micom.kz!A1:D'
-#
-#     try:
-#         service = build('sheets', 'v4', credentials=credentials).spreadsheets().values()
-#
-#         # Чистим(удаляет) весь лист
-#         array_clear = {}
-#         clear_table = service.clear(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-#                                     range=SAMPLE_RANGE_NAME,
-#                                     body=array_clear).execute()
-#
-#         # добавляет информации
-#         array = {'values': dict_cards}
-#         response = service.append(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-#                                   range=SAMPLE_RANGE_NAME,
-#                                   valueInputOption='USER_ENTERED',
-#                                   insertDataOption='OVERWRITE',
-#                                   body=array).execute()
-#
-#     except HttpError as err:
-#         print(err)
+def google_table(dict_cards):
+    import os.path
+
+    from googleapiclient.discovery import build
+    from googleapiclient.errors import HttpError
+    from google.oauth2 import service_account
+
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'credentials.json')
+
+    credentials = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+    # mail bot 'parsers@parsers-372008.iam.gserviceaccount.com'
+    SAMPLE_SPREADSHEET_ID = '107SdHe8_dV6npe_dKE-7xA2QJgxz6ZOywOy-GZyrZX0'
+    SAMPLE_RANGE_NAME = 'leroymerlin.kz!A2:G'
+
+    try:
+        service = build('sheets', 'v4', credentials=credentials).spreadsheets().values()
+
+        # Чистим(удаляет) весь лист
+        array_clear = {}
+        clear_table = service.clear(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                                    range=SAMPLE_RANGE_NAME,
+                                    body=array_clear).execute()
+
+        # добавляет информации
+        array = {'values': dict_cards}
+        response = service.append(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                                  range=SAMPLE_RANGE_NAME,
+                                  valueInputOption='USER_ENTERED',
+                                  insertDataOption='OVERWRITE',
+                                  body=array).execute()
+
+    except HttpError as err:
+        print(err)
 
 
 def main():
     start_time = datetime.now()
 
-    get_data()
-    # schedule.every(1).second.do(get_data)
-    # while True:
-    #     schedule.run_pending()
+    # get_data()
+    schedule.every(1).second.do(get_data)
+    while True:
+        schedule.run_pending()
 
     finish_time = datetime.now()
     spent_time = finish_time - start_time
